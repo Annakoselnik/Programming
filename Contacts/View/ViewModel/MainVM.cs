@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using View.Model;
-using View.Model.Services.View.Model.Services;
+using View.Model.Services;
 
 namespace View.ViewModel
 {

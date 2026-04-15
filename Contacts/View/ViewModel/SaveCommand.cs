@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using View.Model.Services.View.Model.Services;
+using View.Model.Services;
 
 
 namespace View.ViewModel

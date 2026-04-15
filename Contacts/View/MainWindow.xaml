@@ -43,9 +43,9 @@
 
     <Grid Margin="15">
         <Grid.RowDefinitions>
-            <RowDefinition Height="3*"/>
+            <RowDefinition Height="*"/>
             <!-- 3/4 высоты -->
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="auto"/>
             <!-- 1/4 высоты -->
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -86,8 +86,6 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-
-
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
