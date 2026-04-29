@@ -10,7 +10,7 @@ namespace View.Model
     /// <summary>
     /// Класс, представляющий контакт с именем, телефоном и email
     /// </summary>
-    public class Contact
+    public class Contact 
     {
         private string _name;
         private string _phoneNumber;
