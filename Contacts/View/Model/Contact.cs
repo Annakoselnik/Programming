@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 
 namespace View.Model
 {
+    /// <summary>Модель контакта с поддержкой уведомлений об изменении свойств.</summary>
     public class Contact : INotifyPropertyChanged
     {
         private string _name;
         private string _phoneNumber;
         private string _email;
 
+        /// <summary>Имя контакта. Не может быть null (заменяется на пустую строку).</summary>
         public string Name
         {
             get => _name;
@@ -28,6 +30,7 @@ namespace View.Model
             }
         }
 
+        /// <summary>Номер телефона. Не может быть null (заменяется на пустую строку).</summary>
         public string PhoneNumber
         {
             get => _phoneNumber;
@@ -41,6 +44,7 @@ namespace View.Model
             }
         }
 
+        /// <summary>Электронная почта. Не может быть null (заменяется на пустую строку).</summary>
         public string Email
         {
             get => _email;
@@ -54,6 +58,7 @@ namespace View.Model
             }
         }
 
+        /// <summary>Создаёт пустой контакт со всеми полями равными пустой строке.</summary>
         public Contact()
         {
             Name = string.Empty;
@@ -61,6 +66,7 @@ namespace View.Model
             Email = string.Empty;
         }
 
+        /// <summary>Создаёт контакт с указанными значениями. null заменяется на пустую строку.</summary>
         public Contact(string name, string phoneNumber, string email)
         {
             Name = name ?? string.Empty;
@@ -68,9 +74,13 @@ namespace View.Model
             Email = email ?? string.Empty;
         }
 
+        /// <summary>Создаёт глубокую копию текущего контакта.</summary>
         public Contact Clone() => new Contact(Name, PhoneNumber, Email);
 
+        /// <summary>Событие изменения свойства.</summary>
         public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>Вызывает событие PropertyChanged для указанного свойства.</summary>
         protected void OnPropertyChanged([CallerMemberName] string prop = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
     }

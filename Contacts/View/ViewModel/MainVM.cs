@@ -10,6 +10,7 @@ using View.Model.Services;
 
 namespace View.ViewModel
 {
+    /// <summary>ViewModel главного окна. Управляет списком контактов, фильтрацией, режимами добавления/редактирования.</summary>
     public class MainVM : INotifyPropertyChanged
     {
         private readonly ContactSerializer _serializer;
@@ -24,8 +25,10 @@ namespace View.ViewModel
         private bool _applyVisibility = false;
         private Mode _currentMode = Mode.Normal;
 
+        /// <summary>Режимы работы: Normal — просмотр, Add — добавление, Edit — редактирование.</summary>
         public enum Mode { Normal, Add, Edit }
 
+        /// <summary>Полный список контактов.</summary>
         public ObservableCollection<Contact> Contacts
         {
             get => _contacts;
@@ -37,6 +40,7 @@ namespace View.ViewModel
             }
         }
 
+        /// <summary>Представление списка с фильтрацией.</summary>
         public ICollectionView FilteredContactsView
         {
             get => _filteredContactsView;
@@ -47,6 +51,7 @@ namespace View.ViewModel
             }
         }
 
+        /// <summary>Текст для фильтрации контактов по имени.</summary>
         public string FilterText
         {
             get => _filterText;
@@ -61,6 +66,7 @@ namespace View.ViewModel
             }
         }
 
+        /// <summary>Выбранный в списке контакт. При смене обновляет CurrentContact.</summary>
         public Contact SelectedContact
         {
             get => _selectedContact;
@@ -88,6 +94,7 @@ namespace View.ViewModel
             }
         }
 
+        /// <summary>Редактируемый контакт (копия).</summary>
         public Contact CurrentContact
         {
             get => _currentContact;
@@ -101,6 +108,7 @@ namespace View.ViewModel
             }
         }
 
+        /// <summary>Имя редактируемого контакта.</summary>
         public string CurrentName
         {
             get => CurrentContact?.Name ?? string.Empty;
@@ -114,6 +122,7 @@ namespace View.ViewModel
             }
         }
 
+        /// <summary>Телефон редактируемого контакта.</summary>
         public string CurrentPhone
         {
             get => CurrentContact?.PhoneNumber ?? string.Empty;
@@ -127,6 +136,7 @@ namespace View.ViewModel
             }
         }
 
+        /// <summary>Email редактируемого контакта.</summary>
         public string CurrentEmail
         {
             get => CurrentContact?.Email ?? string.Empty;
@@ -140,6 +150,7 @@ namespace View.ViewModel
             }
         }
 
+        /// <summary>Блокировка редактирования полей в режиме просмотра.</summary>
         public bool IsReadOnly
         {
             get => _isReadOnly;
@@ -150,6 +161,7 @@ namespace View.ViewModel
             }
         }
 
+        /// <summary>Видимость кнопок Применить/Отмена в режиме добавления/редактирования.</summary>
         public bool ApplyVisibility
         {
             get => _applyVisibility;
@@ -160,6 +172,7 @@ namespace View.ViewModel
             }
         }
 
+        /// <summary>Активен ли режим добавления или редактирования.</summary>
         public bool IsEditingOrAdding
         {
             get => _isEditingOrAdding;
@@ -173,11 +186,19 @@ namespace View.ViewModel
             }
         }
 
+        /// <summary>Команда добавления нового контакта.</summary>
         public ICommand AddCommand { get; }
+
+        /// <summary>Команда редактирования выбранного контакта.</summary>
         public ICommand EditCommand { get; }
+
+        /// <summary>Команда удаления выбранного контакта.</summary>
         public ICommand RemoveCommand { get; }
+
+        /// <summary>Команда подтверждения добавления/редактирования.</summary>
         public ICommand ApplyCommand { get; }
 
+        /// <summary>Инициализирует ViewModel: загружает контакты, настраивает команды.</summary>
         public MainVM()
         {
             _serializer = new ContactSerializer();
@@ -194,6 +215,7 @@ namespace View.ViewModel
             ApplyCommand = new RelayCommand(_ => Apply(), _ => IsEditingOrAdding);
         }
 
+        /// <summary>Обновляет представление с фильтром по имени.</summary>
         private void UpdateFilteredView()
         {
             FilteredContactsView = CollectionViewSource.GetDefaultView(Contacts);
@@ -204,6 +226,7 @@ namespace View.ViewModel
             };
         }
 
+        /// <summary>Переключает в режим добавления нового контакта.</summary>
         private void StartAdd()
         {
             if (IsEditingOrAdding) return;
@@ -216,6 +239,7 @@ namespace View.ViewModel
             CurrentContact = new Contact();
         }
 
+        /// <summary>Переключает в режим редактирования выбранного контакта.</summary>
         private void StartEdit()
         {
             if (IsEditingOrAdding || SelectedContact == null) return;
@@ -227,6 +251,7 @@ namespace View.ViewModel
             CurrentContact = SelectedContact.Clone();
         }
 
+        /// <summary>Сохраняет изменения (добавляет или обновляет контакт) и сохраняет в файл.</summary>
         private void Apply()
         {
             if (!IsEditingOrAdding) return;
@@ -254,6 +279,7 @@ namespace View.ViewModel
                 SelectedContact = Contacts[0];
         }
 
+        /// <summary>Отменяет редактирование, восстанавливая оригинальный контакт.</summary>
         private void CancelOperation()
         {
             if (_currentMode == Mode.Edit && _originalContact != null && SelectedContact != null)
@@ -269,6 +295,7 @@ namespace View.ViewModel
             CurrentContact = SelectedContact?.Clone() ?? new Contact();
         }
 
+        /// <summary>Удаляет выбранный контакт и сохраняет изменения.</summary>
         private void RemoveContact()
         {
             if (SelectedContact == null || IsEditingOrAdding) return;
@@ -288,6 +315,7 @@ namespace View.ViewModel
             }
         }
 
+        /// <summary>Сохраняет текущий список контактов в файл.</summary>
         private void SaveToFile()
         {
             _serializer.Save(Contacts);
@@ -296,26 +324,5 @@ namespace View.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string prop = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-    }
-
-    public class RelayCommand : ICommand
-    {
-        private readonly Action<object> _execute;
-        private readonly Predicate<object> _canExecute;
-
-        public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
-
-        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
-        public void Execute(object parameter) => _execute(parameter);
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-        public void RaiseCanExecuteChanged() => CommandManager.InvalidateRequerySuggested();
     }
 }
