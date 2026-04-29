@@ -3,121 +3,105 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:View.ViewModel"
+        xmlns:conv="clr-namespace:View.Converters"
         mc:Ignorable="d"
-        Title="Contacts" 
-        Height="450" 
-        Width="650"
+        Title="Contacts" Height="600" Width="800"
         WindowStartupLocation="CenterScreen">
-
     <Window.Resources>
-        <Style TargetType="Button">
-            <Setter Property="Width" Value="75"/>
-            <Setter Property="Height" Value="25"/>
-            <Setter Property="Margin" Value="3"/>
-        </Style>
-
-        <Style TargetType="TextBox">
-            <Setter Property="Margin" Value="3"/>
-            <Setter Property="Height" Value="23"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        </Style>
-
-        <Style TargetType="TextBlock">
-            <Setter Property="Margin" Value="3"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        </Style>
-
-        <Style TargetType="ComboBox">
-            <Setter Property="Margin" Value="3"/>
-            <Setter Property="Height" Value="25"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        </Style>
-
-        <Style TargetType="GroupBox">
-            <Setter Property="Margin" Value="0"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <!-- растяжение по высоте -->
-        </Style>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+        <conv:InverseBoolConverter x:Key="InverseBool"/>
     </Window.Resources>
-
-    <Grid Margin="15">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <!-- 3/4 высоты -->
-            <RowDefinition Height="auto"/>
-            <!-- 1/4 высоты -->
-        </Grid.RowDefinitions>
+    <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="300" MinWidth="250"/>
+            <ColumnDefinition Width="3"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Левая панель: Edit Contact -->
-        <GroupBox Grid.Row="0" Grid.Column="0" Header="Edit Contact" Margin="0,0,10,5">
-            <Grid>
+        <Border Grid.Column="0" Margin="0 0 3 0" Background="#F8F8F8">
+            <Grid Margin="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
-                    <!-- заполняет оставшееся пространство -->
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="Name:"/>
-                <TextBox Grid.Row="1" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                    <Label Content="Find:" Margin="0,0,0,3" Padding="0"/>
+                    <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,0,3"/>
+                </StackPanel>
 
-                <TextBlock Grid.Row="2" Text="Phone Number:"/>
-                <TextBox Grid.Row="3" Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}"/>
-
-                <TextBlock Grid.Row="4" Text="Email:"/>
-                <TextBox Grid.Row="5" Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
-
+                <ListBox Grid.Row="1" 
+                     ItemsSource="{Binding FilteredContactsView}" 
+                     SelectedItem="{Binding SelectedContact}"
+                     DisplayMemberPath="Name"
+                     Margin="0,0,0,8"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                
+                <WrapPanel Grid.Row="2" HorizontalAlignment="Stretch">
+                    <Button Content="Add" Command="{Binding AddCommand}" 
+                            Height="25" Margin="0,0,3,0" MinWidth="60"/>
+                    <Button Content="Edit" Command="{Binding EditCommand}"
+                            Height="25" Margin="0,0,3,0" MinWidth="60"/>
+                    <Button Content="Remove" Command="{Binding RemoveCommand}"
+                            Height="25" Margin="0,0,3,0" MinWidth="60"/>
+                </WrapPanel>
             </Grid>
-        </GroupBox>
+        </Border>
 
-        <!-- Правая панель: Read Contact -->
-        <GroupBox Grid.Row="0" Grid.Column="1" Header="Read Contact" Margin="10,0,0,5">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <!-- заполняет оставшееся пространство -->
-                </Grid.RowDefinitions>
+        <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Stretch" Background="White"/>
 
-                <TextBlock Grid.Row="0" Text="Name:"/>
-                <TextBlock Grid.Row="1" Text="{Binding Name}" TextWrapping="Wrap"/>
+        <Border Grid.Column="2" Background="White">
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="2" Text="Phone Number:"/>
-                <TextBlock Grid.Row="3" Text="{Binding PhoneNumber}" TextWrapping="Wrap"/>
+                <Grid Grid.Column="0" VerticalAlignment="Top">
+                    <Border Width="100" Height="100" Background="LightGray" CornerRadius="10">
+                        <TextBlock Text="No photo" VerticalAlignment="Center" HorizontalAlignment="Center"
+                           Foreground="Gray" FontSize="10"/>
+                    </Border>
+                </Grid>
 
-                <TextBlock Grid.Row="4" Text="Email:"/>
-                <TextBlock Grid.Row="5" Text="{Binding Email}" TextWrapping="Wrap"/>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="6" Text="Contact Type:"/>
-                <TextBlock Grid.Row="7" Text="{Binding SelectedContactType.Name}" TextWrapping="Wrap"/>
+                    <Label Grid.Row="0" Content="Name:" Margin="0,0,0,3"/>
+                    <TextBox Grid.Row="1"
+                     Text="{Binding CurrentName, UpdateSourceTrigger=PropertyChanged}"
+                     IsReadOnly="{Binding IsReadOnly}"
+                     Margin="0,0,0,3"/>
+
+                    <Label Grid.Row="2" Content="Phone Number:" Margin="0,0,0,3"/>
+                    <TextBox Grid.Row="3"
+                     Text="{Binding CurrentPhone, UpdateSourceTrigger=PropertyChanged}"
+                     IsReadOnly="{Binding IsReadOnly}"
+                     Margin="0,0,0,3"/>
+
+                    <Label Grid.Row="4" Content="Email:" Margin="0,0,0,3"/>
+                    <TextBox Grid.Row="5"
+                     Text="{Binding CurrentEmail, UpdateSourceTrigger=PropertyChanged}"
+                     IsReadOnly="{Binding IsReadOnly}"
+                     Margin="0,0,0,3"/>
+
+                    <Button Grid.Row="6"
+                    Content="Apply" Margin="0,3,0,0" Command="{Binding ApplyCommand}"
+                    Width="75" Height="25" HorizontalAlignment="Left" 
+                    Visibility="{Binding ApplyVisibility, Converter={StaticResource BoolToVisibility}}"/>
+                </Grid>
             </Grid>
-        </GroupBox>
-
-        <!-- Кнопки: второй столбец, вторая строка, выровнены по правому краю -->
-        <StackPanel Grid.Row="1" Grid.Column="1" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right" 
-                    Margin="10,5,0,0">
-            <Button Content="Save" Command="{Binding SaveCommand}"/>
-            <Button Content="Load" Command="{Binding LoadCommand}"/>
-        </StackPanel>
+        </Border>
     </Grid>
 </Window>
