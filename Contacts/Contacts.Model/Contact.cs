@@ -3,81 +3,56 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace View.Model
+namespace Contacts.Model
 {
-    /// <summary>Модель контакта с поддержкой уведомлений об изменении свойств и валидацией.</summary>
-    public class Contact : INotifyPropertyChanged, INotifyDataErrorInfo
+    public class Contact : ObservableObject, INotifyDataErrorInfo
     {
         private string _name;
         private string _phoneNumber;
         private string _email;
         private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
 
-        /// <summary>Имя контакта. Не может быть null (заменяется на пустую строку).</summary>
         public string Name
         {
             get => _name;
             set
             {
-                if (_name != value)
-                {
-                    _name = value ?? string.Empty;
-                    OnPropertyChanged();
+                if (SetProperty(ref _name, value ?? string.Empty))
                     Validate(nameof(Name), _name);
-                }
             }
         }
 
-        /// <summary>Номер телефона. Не может быть null (заменяется на пустую строку).</summary>
         public string PhoneNumber
         {
             get => _phoneNumber;
             set
             {
-                if (_phoneNumber != value)
-                {
-                    _phoneNumber = value ?? string.Empty;
-                    OnPropertyChanged();
+                if (SetProperty(ref _phoneNumber, value ?? string.Empty))
                     Validate(nameof(PhoneNumber), _phoneNumber);
-                }
             }
         }
 
-        /// <summary>Электронная почта. Не может быть null (заменяется на пустую строку).</summary>
         public string Email
         {
             get => _email;
             set
             {
-                if (_email != value)
-                {
-                    _email = value ?? string.Empty;
-                    OnPropertyChanged();
+                if (SetProperty(ref _email, value ?? string.Empty))
                     Validate(nameof(Email), _email);
-                }
             }
         }
 
-        /// <summary>Создаёт пустой контакт со всеми полями равными пустой строке.</summary>
-        public Contact()
-        {
-            Name = string.Empty;
-            PhoneNumber = string.Empty;
-            Email = string.Empty;
-        }
-
-        /// <summary>Создаёт контакт с указанными значениями. null заменяется на пустую строку.</summary>
-        public Contact(string name, string phoneNumber, string email)
+        public Contact() => Name = PhoneNumber = Email = string.Empty;
+        public Contact(string name, string phone, string email)
         {
             Name = name ?? string.Empty;
-            PhoneNumber = phoneNumber ?? string.Empty;
+            PhoneNumber = phone ?? string.Empty;
             Email = email ?? string.Empty;
         }
 
-        /// <summary>Создаёт глубокую копию текущего контакта.</summary>
         public Contact Clone() => new Contact(Name, PhoneNumber, Email);
 
         private void Validate(string propertyName, string value)
@@ -93,7 +68,6 @@ namespace View.Model
                     else if (value.Length > 100)
                         errors.Add("Имя не должно превышать 100 символов.");
                     break;
-
                 case nameof(PhoneNumber):
                     if (string.IsNullOrWhiteSpace(value))
                         errors.Add("Номер телефона не может быть пустым.");
@@ -106,7 +80,6 @@ namespace View.Model
                             errors.Add("Номер телефона должен быть в формате: +7 (999) 111-22-33");
                     }
                     break;
-
                 case nameof(Email):
                     if (string.IsNullOrWhiteSpace(value))
                         errors.Add("Email не может быть пустым.");
@@ -138,18 +111,8 @@ namespace View.Model
         }
 
         public bool HasErrors => _errors.Any();
-
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public IEnumerable GetErrors(string propertyName)
-        {
-            if (string.IsNullOrEmpty(propertyName) || !_errors.ContainsKey(propertyName))
-                return null;
-            return _errors[propertyName];
-        }
-
-        protected void OnPropertyChanged([CallerMemberName] string prop = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+        public IEnumerable GetErrors(string propertyName) =>
+            _errors.ContainsKey(propertyName) ? _errors[propertyName] : null;
     }
 }
