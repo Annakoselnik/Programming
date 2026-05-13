@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="View/View.csproj" Id="8cbf40d4-8ffe-4aee-a984-52fd4ed367b0" />
+  <Project Path="Contacts.Model/Contacts.Model.csproj" Id="1a124575-1263-4039-aec9-cfc350d614c3" />
+  <Project Path="Contacts.ViewModel/Contacts.ViewModel.csproj" Id="ab4fd224-9794-4149-a799-140556b63a8d" />
+  <Project Path="View/Contacts.View.csproj" />
 </Solution>

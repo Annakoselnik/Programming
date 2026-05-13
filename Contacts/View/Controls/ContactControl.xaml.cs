@@ -1,9 +1,7 @@
-﻿using System.Text.RegularExpressions;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
-namespace View.Controls
+namespace Contacts.View.Controls
 {
     public partial class ContactControl : UserControl
     {
@@ -12,23 +10,20 @@ namespace View.Controls
             InitializeComponent();
         }
 
-        private void OnPreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void TextBox_ValidationError(object sender, ValidationErrorEventArgs e)
         {
-            var regex = new Regex(@"^[0-9+\-\(\)\s\.]*$");
-            e.Handled = !regex.IsMatch(e.Text);
-        }
+            var textBox = sender as TextBox;
+            if (textBox == null) return;
 
-        private void OnPasting(object sender, DataObjectPastingEventArgs e)
-        {
-            if (e.DataObject.GetDataPresent(typeof(string)))
+            if (e.Action == ValidationErrorEventAction.Added)
             {
-                string text = (string)e.DataObject.GetData(typeof(string));
-                var regex = new Regex(@"^[0-9+\-\(\)\s\.]*$");
-                if (!regex.IsMatch(text))
-                    e.CancelCommand();
+                if (e.Error.ErrorContent != null)
+                    textBox.ToolTip = e.Error.ErrorContent.ToString();
             }
-            else
-                e.CancelCommand();
+            else if (e.Action == ValidationErrorEventAction.Removed)
+            {
+                textBox.ToolTip = null;
+            }
         }
     }
 }
