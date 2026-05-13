@@ -3,80 +3,51 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace View.Model.Services
 {
-    /// <summary>
-    /// Класс для сериализации и десериализации контакта в JSON
-    /// </summary>
+    /// <summary>Сериализация списка контактов в JSON-файл и обратно.</summary>
     public class ContactSerializer
     {
         private string _filePath;
 
-        /// <summary>
-        /// Путь к файлу для сохранения/загрузки контакта
-        /// </summary>
+        /// <summary>Путь к JSON-файлу. Если null, используется путь по умолчанию.</summary>
         public string FilePath
         {
             get => _filePath;
             set => _filePath = value ?? GetDefaultPath();
         }
 
-        /// <summary>
-        /// Конструктор с указанием пути к файлу
-        /// </summary>
-        /// <param name="filePath">Путь к файлу</param>
+        /// <summary>Создаёт сериализатор с указанным путём (или путём по умолчанию).</summary>
         public ContactSerializer(string filePath = null)
         {
             FilePath = filePath ?? GetDefaultPath();
         }
 
-        /// <summary>
-        /// Получает путь по умолчанию (Мои документы/Contacts/contacts.json)
-        /// </summary>
-        /// <returns>Путь по умолчанию</returns>
         private string GetDefaultPath()
         {
             string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string contactsFolder = Path.Combine(documentsPath, "Contacts");
-
-            // Создаем папку, если её нет
             if (!Directory.Exists(contactsFolder))
-            {
                 Directory.CreateDirectory(contactsFolder);
-            }
-
             return Path.Combine(contactsFolder, "contacts.json");
         }
 
-        /// <summary>
-        /// Сохраняет контакт в файл
-        /// </summary>
-        /// <param name="contact">Контакт для сохранения</param>
-        public void Save(Contact contact)
+        /// <summary>Сохраняет список контактов в JSON-файл.</summary>
+        public void Save(IEnumerable<Contact> contacts)
         {
-            if (contact == null)
-                throw new ArgumentNullException(nameof(contact));
-
-            string json = JsonConvert.SerializeObject(contact, Formatting.Indented);
+            if (contacts == null) throw new ArgumentNullException(nameof(contacts));
+            string json = JsonConvert.SerializeObject(contacts, Formatting.Indented);
             File.WriteAllText(FilePath, json);
         }
 
-        /// <summary>
-        /// Загружает контакт из файла
-        /// </summary>
-        /// <returns>Загруженный контакт или новый контакт, если файл не найден</returns>
-        public Contact Load()
+        /// <summary>Загружает список контактов из JSON-файла. Если файл отсутствует, возвращает пустой список.</summary>
+        public List<Contact> Load()
         {
             if (!File.Exists(FilePath))
-            {
-                return new Contact();
-            }
-
+                return new List<Contact>();
             string json = File.ReadAllText(FilePath);
-            return JsonConvert.DeserializeObject<Contact>(json) ?? new Contact();
+            return JsonConvert.DeserializeObject<List<Contact>>(json) ?? new List<Contact>();
         }
     }
 }

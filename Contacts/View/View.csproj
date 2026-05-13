@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8CBF40D4-8FFE-4AEE-A984-52FD4ED367B0}</ProjectGuid>
+    <ProjectGuid>{39516C1B-D78A-AC8A-D76E-1BE6EB844C77}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>View</RootNamespace>
     <AssemblyName>View</AssemblyName>
@@ -58,10 +58,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\ContactControl.xaml.cs">
+      <DependentUpon>ContactControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\InverseBoolConverter.cs" />
     <Compile Include="Model\Services\ContactSerializer.cs" />
-    <Compile Include="ViewModel\LoadCommand.cs" />
     <Compile Include="ViewModel\MainVM.cs" />
-    <Compile Include="ViewModel\SaveCommand.cs" />
+    <Compile Include="ViewModel\RelayCommand.cs" />
+    <Page Include="Controls\ContactControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

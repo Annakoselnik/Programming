@@ -3,121 +3,77 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:View.Controls"
+        xmlns:converters="clr-namespace:View.Converters"
         mc:Ignorable="d"
-        Title="Contacts" 
-        Height="450" 
-        Width="650"
-        WindowStartupLocation="CenterScreen">
+        Title="Контакты" Height="450" Width="600">
 
     <Window.Resources>
-        <Style TargetType="Button">
-            <Setter Property="Width" Value="75"/>
-            <Setter Property="Height" Value="25"/>
-            <Setter Property="Margin" Value="3"/>
-        </Style>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
 
-        <Style TargetType="TextBox">
-            <Setter Property="Margin" Value="3"/>
-            <Setter Property="Height" Value="23"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        </Style>
+        <DataTemplate x:Key="ContactItemTemplate">
+            <StackPanel Margin="5">
+                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"/>
+                <TextBlock Text="{Binding PhoneNumber}" FontSize="12" Foreground="Gray"/>
+            </StackPanel>
+        </DataTemplate>
 
-        <Style TargetType="TextBlock">
-            <Setter Property="Margin" Value="3"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        </Style>
-
-        <Style TargetType="ComboBox">
-            <Setter Property="Margin" Value="3"/>
-            <Setter Property="Height" Value="25"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        </Style>
-
-        <Style TargetType="GroupBox">
-            <Setter Property="Margin" Value="0"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <!-- растяжение по высоте -->
+        <Style TargetType="ListBoxItem">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="LightBlue"/>
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
 
-    <Grid Margin="15">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <!-- 3/4 высоты -->
-            <RowDefinition Height="auto"/>
-            <!-- 1/4 высоты -->
-        </Grid.RowDefinitions>
+    <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Левая панель: Edit Contact -->
-        <GroupBox Grid.Row="0" Grid.Column="0" Header="Edit Contact" Margin="0,0,10,5">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <!-- заполняет оставшееся пространство -->
-                </Grid.RowDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="Name:"/>
-                <TextBox Grid.Row="1" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Grid.Row="0" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="5" Tag="Фильтр..."/>
 
-                <TextBlock Grid.Row="2" Text="Phone Number:"/>
-                <TextBox Grid.Row="3" Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}"/>
+            <ListBox Grid.Row="1" 
+                     ItemsSource="{Binding FilteredContactsView}"
+                     SelectedItem="{Binding SelectedContact}"
+                     ItemTemplate="{StaticResource ContactItemTemplate}"
+                     Margin="5"/>
 
-                <TextBlock Grid.Row="4" Text="Email:"/>
-                <TextBox Grid.Row="5" Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,10" Width="183">
+                <Button Content="Add" Command="{Binding AddCommand}" Margin="5" Width="50" Height="20"/>
+                <Button Content="Edit" Command="{Binding EditCommand}" Margin="5" Width="50" Height="20"/>
+                <Button Content="Remove" Command="{Binding RemoveCommand}" Margin="5" Width="50" Height="20"/>
+            </StackPanel>
+        </Grid>
 
-            </Grid>
-        </GroupBox>
+        <Grid Grid.Column="1" 
+              IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBoolConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Правая панель: Read Contact -->
-        <GroupBox Grid.Row="0" Grid.Column="1" Header="Read Contact" Margin="10,0,0,5">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <!-- заполняет оставшееся пространство -->
-                </Grid.RowDefinitions>
+            <controls:ContactControl Grid.Row="0" DataContext="{Binding CurrentContact}"/>
 
-                <TextBlock Grid.Row="0" Text="Name:"/>
-                <TextBlock Grid.Row="1" Text="{Binding Name}" TextWrapping="Wrap"/>
-
-                <TextBlock Grid.Row="2" Text="Phone Number:"/>
-                <TextBlock Grid.Row="3" Text="{Binding PhoneNumber}" TextWrapping="Wrap"/>
-
-                <TextBlock Grid.Row="4" Text="Email:"/>
-                <TextBlock Grid.Row="5" Text="{Binding Email}" TextWrapping="Wrap"/>
-
-                <TextBlock Grid.Row="6" Text="Contact Type:"/>
-                <TextBlock Grid.Row="7" Text="{Binding SelectedContactType.Name}" TextWrapping="Wrap"/>
-            </Grid>
-        </GroupBox>
-
-        <!-- Кнопки: второй столбец, вторая строка, выровнены по правому краю -->
-        <StackPanel Grid.Row="1" Grid.Column="1" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right" 
-                    Margin="10,5,0,0">
-            <Button Content="Save" Command="{Binding SaveCommand}"/>
-            <Button Content="Load" Command="{Binding LoadCommand}"/>
-        </StackPanel>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5"
+                        Visibility="{Binding ApplyVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Button Content="Apply" Command="{Binding ApplyCommand}" Margin="5" Width="70"/>
+                <Button Content="Cancel" Command="{Binding CancelCommand}" Margin="5" Width="70"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
