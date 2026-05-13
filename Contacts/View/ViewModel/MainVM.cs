@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -198,6 +198,9 @@ namespace View.ViewModel
         /// <summary>Команда подтверждения добавления/редактирования.</summary>
         public ICommand ApplyCommand { get; }
 
+        /// <summary>Команда отмены редактирования/добавления.</summary>
+        public ICommand CancelCommand { get; }
+
         /// <summary>Инициализирует ViewModel: загружает контакты, настраивает команды.</summary>
         public MainVM()
         {
@@ -212,7 +215,17 @@ namespace View.ViewModel
             AddCommand = new RelayCommand(_ => StartAdd(), _ => !IsEditingOrAdding);
             EditCommand = new RelayCommand(_ => StartEdit(), _ => !IsEditingOrAdding && SelectedContact != null);
             RemoveCommand = new RelayCommand(_ => RemoveContact(), _ => !IsEditingOrAdding && SelectedContact != null);
-            ApplyCommand = new RelayCommand(_ => Apply(), _ => IsEditingOrAdding);
+            ApplyCommand = new RelayCommand(_ => Apply(), _ => IsEditingOrAdding && !(CurrentContact?.HasErrors ?? true));
+            CancelCommand = new RelayCommand(_ => CancelOperation(), _ => IsEditingOrAdding);
+
+            PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(CurrentContact) && CurrentContact != null)
+                {
+                    CurrentContact.ErrorsChanged += (sender, args) => (ApplyCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                    (ApplyCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                }
+            };
         }
 
         /// <summary>Обновляет представление с фильтром по имени.</summary>
@@ -254,7 +267,7 @@ namespace View.ViewModel
         /// <summary>Сохраняет изменения (добавляет или обновляет контакт) и сохраняет в файл.</summary>
         private void Apply()
         {
-            if (!IsEditingOrAdding) return;
+            if (!IsEditingOrAdding || (CurrentContact?.HasErrors ?? true)) return;
 
             if (_currentMode == Mode.Add && CurrentContact != null)
             {
@@ -322,7 +335,8 @@ namespace View.ViewModel
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string prop = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
