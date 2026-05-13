@@ -3,6 +3,7 @@ using System.Windows.Input;
 
 namespace View.ViewModel
 {
+    /// <summary>Реализация ICommand для использования в MVVM. Поддерживает автоматическое обновление состояния CanExecute.</summary>
     public class RelayCommand : ICommand
     {
         private readonly Action<object> _execute;
